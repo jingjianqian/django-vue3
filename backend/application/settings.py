@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'platformsettings',
     'lymonitor',
     'lywebsocket',
+    'school',
 ]
 
 MIDDLEWARE = [

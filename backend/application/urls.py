@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path,include, re_path
+from django.urls import path, include, re_path
 from django.views.static import serve
 from django.conf import settings
 from drf_yasg import openapi
@@ -25,24 +25,26 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from mysystem.views.login import LoginView,CaptchaView
+from mysystem.views.login import LoginView, CaptchaView
 from utils.swagger import CustomOpenAPISchemaGenerator
 
-#前端接口view
-from apps.oauth.views import WeChatXCXLoginAPIView,XCXWeChatUserInfoUpdateAPIView,WeChatXCXMobileLoginAPIView,WeChatGZHLoginAPIView,WeChatGZHBindAPIView,GetXCXShareQrcodeView,TTXCXLoginAPIView
-from apps.address.views import ProvinceAreasView,SubAreasView,GetAddressAccuracyView,GetProvinceAreasListView
-from apps.logins.views import APPMobilePasswordLoginView,SendSmsCodeView,APPMobileSMSLoginView,ForgetPasswdResetView,RegisterView
-from apps.lyusers.views import SetUserNicknameView,ChangeAvatarView,uploadImagesView
+# 前端接口view
+from apps.oauth.views import WeChatXCXLoginAPIView, XCXWeChatUserInfoUpdateAPIView, WeChatXCXMobileLoginAPIView, \
+    WeChatGZHLoginAPIView, WeChatGZHBindAPIView, GetXCXShareQrcodeView, TTXCXLoginAPIView
+from apps.address.views import ProvinceAreasView, SubAreasView, GetAddressAccuracyView, GetProvinceAreasListView
+from apps.logins.views import APPMobilePasswordLoginView, SendSmsCodeView, APPMobileSMSLoginView, ForgetPasswdResetView, \
+    RegisterView
+from apps.lyusers.views import SetUserNicknameView, ChangeAvatarView, uploadImagesView
 from apps.lymessages.views import UserMessagesView
-from apps.platformsettings.views import GetOtherManageDetailView,GetLunboManageListView
+from apps.platformsettings.views import GetOtherManageDetailView, GetLunboManageListView
 
-#app下载页
+# app下载页
 from apps.lyusers.views import downloadapp
-#媒体文件流式响应
+# 媒体文件流式响应
 from utils.streamingmedia_response import streamingmedia_serve
-#部署vue
+# 部署vue
 from django.views.generic import TemplateView
-#是否允许前端接口访问
+# 是否允许前端接口访问
 from utils.middleware import OperateAllowFrontendView
 
 schema_view = get_schema_view(
@@ -61,16 +63,16 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('static/<path:path>', serve, {'document_root': settings.STATIC_ROOT},),  # 处理静态文件
+    path('static/<path:path>', serve, {'document_root': settings.STATIC_ROOT}, ),  # 处理静态文件
     # path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT},),  # 处理媒体文件
     path('media/<path:path>', streamingmedia_serve, {'document_root': settings.MEDIA_ROOT}, ),  # 处理媒体文件
     # path('admin/', admin.site.urls),
-    #api文档地址(正式上线需要注释掉)
+    # api文档地址(正式上线需要注释掉)
     re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('lyapi/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path(r'lyredoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    #管理后台的标准接口
+    # 管理后台的标准接口
     path('api/system/', include('mysystem.urls')),
     path('api/monitor/', include('lymonitor.urls')),
     path('api/terminal/', include('lywebsocket.urls')),
@@ -78,12 +80,12 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/captcha/', CaptchaView.as_view()),
 
-    #管理后台其他自定义接口
+    # 管理后台其他自定义接口
     path('api/platformsettings/', include('apps.platformsettings.urls')),
     path('api/messages/', include('apps.lymessages.urls')),
     path('api/users/', include('apps.lyusers.urls')),
 
-    #前端用户接口
+    # 前端用户接口
     path('api/app/register/', RegisterView.as_view(), name='app端手机号注册'),
     path('api/xcx/ttlogin/', TTXCXLoginAPIView.as_view(), name='字节跳动小程序登录认证'),
     path('api/app/login/', APPMobilePasswordLoginView.as_view(), name='app端手机号密码登录认证'),
@@ -105,17 +107,16 @@ urlpatterns = [
     path('api/getothersettings/', GetOtherManageDetailView.as_view(), name='前端用户获取平台其他设置'),
     path('api/getrotationimgs/', GetLunboManageListView.as_view(), name='前端用户获取平台轮播图设置'),
 
-    re_path(r'^api/areas/$', ProvinceAreasView.as_view(),name='省市区三级联动获取省'),
-    re_path(r'^api/areas/(?P<pk>[1-9]\d*)/$', SubAreasView.as_view(),name='省市区三级联动获取市/区'),
+    re_path(r'^api/areas/$', ProvinceAreasView.as_view(), name='省市区三级联动获取省'),
+    re_path(r'^api/areas/(?P<pk>[1-9]\d*)/$', SubAreasView.as_view(), name='省市区三级联动获取市/区'),
     path('api/getallareaslist/', GetProvinceAreasListView.as_view(), name='递归获取所有省市区数据'),
     path('api/getaddressaccuracy/', GetAddressAccuracyView.as_view(), name='后台根据详细地址获取经纬度'),
 
-    #是否允许前端接口访问(临时操作，重启后无效)
+    # 是否允许前端接口访问(临时操作，重启后无效)
     path('api/super/operate/', OperateAllowFrontendView.as_view(), name='超级管理员动态操作是否允许前端api接口访问'),
 
-    #集成部署后端管理页面
-    path('downloadapp/',downloadapp ,name='前端APP下载页'),
-    path('favicon.ico',RedirectView.as_view(url=r'static/favicon.ico')),
-    path('', TemplateView.as_view(template_name="index.html"),name='后台管理默认页面'),
+    # 集成部署后端管理页面
+    path('downloadapp/', downloadapp, name='前端APP下载页'),
+    path('favicon.ico', RedirectView.as_view(url=r'static/favicon.ico')),
+    path('', TemplateView.as_view(template_name="index.html"), name='后台管理默认页面'),
 ]
-
